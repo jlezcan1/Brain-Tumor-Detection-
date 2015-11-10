@@ -1,3 +1,15 @@
-eq2N:=simplify(subs(eta=(sigma/t^(1/3))^3,eq2N),power,symbolic);
-eta=(sigma/t^(1/3))^3;
-P(x,y,sigma)=1/3*1/sigma^2*3^(1/3)*AiryAi(1/3*3^(2/3)*(-x+X)/sigma)*AiryAi(1/3*3^(2/3)*(-y+Y)/sigma);
+restart:with(inttrans):
+eq:=diff(P(x,t),t)=eta*diff(P(x,t),x,x,x);
+eq1:=P(x,0)=Dirac(x-X);
+eq2:=fourier(eq,x,k);
+fourier(P(x,t),x,k)=1/sqrt(2*Pi)*Int(P(x,t)*exp(-I*k*x),x=-infinity..infinity);
+eq3:=fourier(eq1,x,k);
+fourier(P(x,t),x,k)=P(t);
+eq4:=subs(fourier(P(x,t),x,k)=P(t),eq2);
+P(0)=rhs(eq3);
+eq5:=dsolve({eq4,P(0)=rhs(eq3)});
+P(x,t)=1/sqrt(2*Pi)*Int(rhs(eq5)*exp(I*k*x),k=-infinity..infinity);
+eq6:=P(x,t)=invfourier(rhs(eq5),k,x) assuming X>0 and eta>0 and t>0;
+eq7:=P(x,t)=simplify(convert(rhs(eq6),AiryAi),power,symbolic);
+eq8:=P(x,y,t)=subs(eta=eta[1],rhs(eq7))*subs(x=y,X=Y,eta=eta[2],rhs(eq7));
+
